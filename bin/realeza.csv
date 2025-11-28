@@ -1,0 +1,13 @@
+id,nombre,apellido,genero,edad,id_padre,esta_muerto,fue_rey,es_rey
+1,Fernando,VI,M,85,0,1,1,0
+2,Elena,VI,H,60,1,0,0,1
+3,Carlos,VI,M,58,1,1,0,0
+4,Pablo,VI,M,35,2,0,0,0
+5,Sofia,VI,H,32,2,0,0,0
+6,Abraham,VI,H,30,3,0,0,0
+7,Leonor,VI,H,15,4,0,0,0
+8,David,VI,M,12,4,0,0,0
+9,Marco,VI,M,28,5,0,0,0
+10,Laura,VI,H,26,5,0,0,0
+11,Lucas,VI,M,40,1,0,0,0
+12,Clara,VI,H,20,11,0,0,0
