@@ -2,7 +2,10 @@
 
 void mostrar_menu() {
     cout << "\n    SISTEMA DE DINASTIA REAL:    \n";
-    cout << "Solo disponible la Opcion 4 (Salir).\n";
+    cout << "1. Mostrar linea de sucesion actual (Solo los Vivos)\n"; // <--- AÑADIDO
+    cout << "2. Asignar Nuevo Rey Automaticamente\n";
+    cout << "3. Modificar datos de un Noble\n";
+    cout << "4. Guardar datos y Salir\n";
     cout << "Por favor, seleccione una opcion: ";
 }
 
@@ -17,9 +20,12 @@ void pausa() {
 }
 
 void gestionar_opcion(ArbolDinamico& arbol, int opcion) {
+    int id;
+    string input;
+    
     switch (opcion) {
         case 1:
-            cout << "Opcion 1 (Sucesion) pendiente de implementacion.\n";
+            arbol.mostrar_linea_sucesion(); // <--- LLAMADA IMPLEMENTADA
             break;
         case 2:
             cout << "Opcion 2 (Nuevo Rey) pendiente de implementacion.\n";
@@ -28,7 +34,7 @@ void gestionar_opcion(ArbolDinamico& arbol, int opcion) {
             cout << "Opcion 3 (Modificar) pendiente de implementacion.\n";
             break;
         case 4:
-            arbol.guardar_a_csv(); // <-- ¡Guardado implementado!
+            arbol.guardar_a_csv(); 
             cout << "\nDatos guardados. Saliendo del programa...\n";
             break;
         default:

@@ -91,7 +91,7 @@ void ArbolDinamico::cargar_desde_csv() {
     archivo.close();
 }
 
-// NUEVAS FUNCIONES DE PERSISTENCIA Y BUSQUEDA:
+// FUNCIONES DE PERSISTENCIA Y BÚSQUEDA 
 void ArbolDinamico::guardar_recursivo(Noble* nodo, ofstream& archivo) const {
     if (!nodo) return;
 
@@ -142,8 +142,61 @@ Noble* ArbolDinamico::obtener_rey_actual() const {
     return buscar_rey_recursivo(raiz);
 }
 
-// El resto de funciones se dejan vacías/nulas
-void ArbolDinamico::mostrar_linea_sucesion() const {}
+
+
+void ArbolDinamico::mostrar_sucesion_vivos_recursivo(Noble* nodo, int& contador) const {
+    if (!nodo) return;
+
+    // Muestra el noble actual si está vivo y NO es el rey
+    if (!nodo->es_rey && !nodo->esta_muerto) {
+        cout << contador++ << ". ID: " << nodo->id 
+             << " - " << nodo->nombre << " " << nodo->apellido 
+             << " (" << nodo->genero << ", " << nodo->edad << " años)"
+             << (nodo->fue_rey ? " [Ex Rey]" : "") << "\n";
+    }
+
+    // Traversa recursiva, priorizando la línea de sucesión directa (primogenito)
+    mostrar_sucesion_vivos_recursivo(nodo->primogenito, contador);
+    mostrar_sucesion_vivos_recursivo(nodo->segundogenito, contador);
+}
+
+
+void ArbolDinamico::mostrar_linea_sucesion() const {
+    Noble* rey_actual = obtener_rey_actual();
+
+    cout << "\n    LINEA DE SUCESION ACTUAL (VIVOS)   \n";
+
+    if (!raiz) {
+        cout << "El arbol esta vacio.\n";
+        return;
+    }
+
+    if (rey_actual) {
+        cout << "REY/REINA ACTUAL: ID: " << rey_actual->id << " - " 
+             << rey_actual->nombre << " " << rey_actual->apellido 
+             << " (" << rey_actual->genero << ", " << rey_actual->edad << " años)\n";
+        cout << "------------------------------------------\n";
+    } else {
+        cout << "ADVERTENCIA: No hay un rey/reina designado. La sucesion empieza desde la raiz.\n";
+    }
+    
+    int contador = 1;
+
+    // La sucesión se muestra a partir de los descendientes del rey actual (o la raíz si no hay rey)
+    Noble* nodo_inicio = rey_actual ? rey_actual : raiz;
+
+    if (nodo_inicio) {
+        // Ejecutamos la recursión para recorrer todos los descendientes
+        mostrar_sucesion_vivos_recursivo(nodo_inicio->primogenito, contador);
+        mostrar_sucesion_vivos_recursivo(nodo_inicio->segundogenito, contador);
+    }
+    
+    if (contador == 1) {
+        cout << "No hay sucesores vivos elegibles en la linea de descendencia directa del rey.\n";
+    }
+}
+
+// Las funciones pendientes se mantienen vacías
 void ArbolDinamico::asignar_nuevo_rey_auto() {}
 void ArbolDinamico::modificar_noble(int id_noble) {}
 // ... el resto de auxiliares ...
