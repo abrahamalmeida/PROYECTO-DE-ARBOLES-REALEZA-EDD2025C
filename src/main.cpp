@@ -18,8 +18,18 @@ void pausa() {
 
 void gestionar_opcion(ArbolDinamico& arbol, int opcion) {
     switch (opcion) {
+        case 1:
+            cout << "Opcion 1 (Sucesion) pendiente de implementacion.\n";
+            break;
+        case 2:
+            cout << "Opcion 2 (Nuevo Rey) pendiente de implementacion.\n";
+            break;
+        case 3:
+            cout << "Opcion 3 (Modificar) pendiente de implementacion.\n";
+            break;
         case 4:
-            cout << "\nGuardando datos (pendiente). Saliendo...\n";
+            arbol.guardar_a_csv(); // <-- ¡Guardado implementado!
+            cout << "\nDatos guardados. Saliendo del programa...\n";
             break;
         default:
             cout << "Opcion no valida. Intente de nuevo.\n";

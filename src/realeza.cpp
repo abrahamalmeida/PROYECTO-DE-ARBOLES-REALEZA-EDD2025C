@@ -91,11 +91,59 @@ void ArbolDinamico::cargar_desde_csv() {
     archivo.close();
 }
 
-// El resto de funciones se dejan vacías/nulas (como en el commit anterior)
-void ArbolDinamico::guardar_a_csv() const {}
+// NUEVAS FUNCIONES DE PERSISTENCIA Y BUSQUEDA:
+void ArbolDinamico::guardar_recursivo(Noble* nodo, ofstream& archivo) const {
+    if (!nodo) return;
+
+    archivo << nodo->id << ","
+            << nodo->nombre << ","
+            << nodo->apellido << ","
+            << nodo->genero << ","
+            << nodo->edad << ","
+            << nodo->id_padre << ","
+            << (nodo->esta_muerto ? "1" : "0") << ","
+            << (nodo->fue_rey ? "1" : "0") << ","
+            << (nodo->es_rey ? "1" : "0") << "\n";
+
+    guardar_recursivo(nodo->primogenito, archivo);
+    guardar_recursivo(nodo->segundogenito, archivo);
+}
+
+void ArbolDinamico::guardar_a_csv() const {
+    ofstream archivo(archivo_realeza);
+    if (!archivo.is_open()) throw runtime_error("No se pudo abrir/crear el archivo " + archivo_realeza);
+
+    archivo << "id,nombre,apellido,genero,edad,id_padre,esta_muerto,fue_rey,es_rey\n";
+    guardar_recursivo(raiz, archivo);
+    archivo.close();
+}
+
+Noble* ArbolDinamico::buscar_noble_por_id(Noble* nodo, int id) const {
+    if (!nodo) return nullptr;
+    if (nodo->id == id) return nodo;
+    
+    Noble* encontrado = buscar_noble_por_id(nodo->primogenito, id);
+    if (encontrado) return encontrado;
+    
+    return buscar_noble_por_id(nodo->segundogenito, id);
+}
+
+Noble* ArbolDinamico::buscar_rey_recursivo(Noble* nodo) const {
+    if (!nodo) return nullptr;
+    if (nodo->es_rey) return nodo;
+
+    Noble* encontrado = buscar_rey_recursivo(nodo->primogenito);
+    if (encontrado) return encontrado;
+
+    return buscar_rey_recursivo(nodo->segundogenito);
+}
+
+Noble* ArbolDinamico::obtener_rey_actual() const {
+    return buscar_rey_recursivo(raiz);
+}
+
+// El resto de funciones se dejan vacías/nulas
 void ArbolDinamico::mostrar_linea_sucesion() const {}
 void ArbolDinamico::asignar_nuevo_rey_auto() {}
 void ArbolDinamico::modificar_noble(int id_noble) {}
-Noble* ArbolDinamico::buscar_noble_por_id(Noble* nodo, int id) const { return nullptr; }
-Noble* ArbolDinamico::obtener_rey_actual() const { return nullptr; }
 // ... el resto de auxiliares ...
