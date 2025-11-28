@@ -1,0 +1,66 @@
+#include "realeza.h"
+
+void mostrar_menu() {
+    cout << "\n    SISTEMA DE DINASTIA REAL:    \n";
+    cout << "Solo disponible la Opcion 4 (Salir).\n";
+    cout << "Por favor, seleccione una opcion: ";
+}
+
+void limpiar_buffer() {
+    cin.clear();
+    cin.ignore(256, '\n'); 
+}
+
+void pausa() {
+    cout << "\nPresione Enter para continuar...";
+    limpiar_buffer();
+}
+
+void gestionar_opcion(ArbolDinamico& arbol, int opcion) {
+    switch (opcion) {
+        case 4:
+            cout << "\nGuardando datos (pendiente). Saliendo...\n";
+            break;
+        default:
+            cout << "Opcion no valida. Intente de nuevo.\n";
+    }
+}
+
+int main() {
+    ArbolDinamico arbol;
+    
+    try {
+        arbol.cargar_desde_csv();
+        cout << "   SISTEMA DE SUCESION REAL:    \n";
+        cout << "Datos de dinastia cargados correctamente desde el archivo realeza.csv.\n";
+        
+        int opcion;
+        string opcion_str;
+        do {
+            mostrar_menu();
+            getline(cin, opcion_str);
+
+            try {
+                opcion = stoi(opcion_str);
+            } catch (...) {
+                opcion = 0;
+            }
+            
+            if (opcion != 4) {
+                try {
+                    gestionar_opcion(arbol, opcion);
+                } catch (const exception& e) {
+                    cerr << "\nError: " << e.what() << "\n";
+                }
+                pausa();
+            }
+        } while (opcion != 4);
+        
+    } catch (const exception& e) {
+        cerr << "Error critico al iniciar: " << e.what() << "\n";
+        pausa();
+        return 1;
+    }
+    
+    return 0;
+}
