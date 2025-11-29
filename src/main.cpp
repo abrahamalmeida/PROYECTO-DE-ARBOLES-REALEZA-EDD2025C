@@ -2,8 +2,8 @@
 
 void mostrar_menu() {
     cout << "\n    SISTEMA DE DINASTIA REAL:    \n";
-    cout << "1. Mostrar linea de sucesion actual (Solo los Vivos)\n"; // <--- AÑADIDO
-    cout << "2. Asignar Nuevo Rey Automaticamente\n";
+    cout << "1. Mostrar linea de sucesion actual (Solo los Vivos)\n";
+    cout << "2. Asignar Nuevo Rey Automaticamente\n"; // <--- Nuevo
     cout << "3. Modificar datos de un Noble\n";
     cout << "4. Guardar datos y Salir\n";
     cout << "Por favor, seleccione una opcion: ";
@@ -25,10 +25,10 @@ void gestionar_opcion(ArbolDinamico& arbol, int opcion) {
     
     switch (opcion) {
         case 1:
-            arbol.mostrar_linea_sucesion(); // <--- LLAMADA IMPLEMENTADA
+            arbol.mostrar_linea_sucesion();
             break;
         case 2:
-            cout << "Opcion 2 (Nuevo Rey) pendiente de implementacion.\n";
+            arbol.asignar_nuevo_rey_auto(); // <--- LLAMADA IMPLEMENTADA
             break;
         case 3:
             cout << "Opcion 3 (Modificar) pendiente de implementacion.\n";
@@ -50,6 +50,12 @@ int main() {
         cout << "   SISTEMA DE SUCESION REAL:    \n";
         cout << "Datos de dinastia cargados correctamente desde el archivo realeza.csv.\n";
         
+        Noble* rey_actual = arbol.obtener_rey_actual();
+        if (!rey_actual) {
+            cout << "No hay un rey inicial en los datos. Asignando el primero elegible...\n";
+            arbol.asignar_nuevo_rey_auto(); // <--- Intenta asignar rey al inicio si no hay
+        }
+
         int opcion;
         string opcion_str;
         do {
