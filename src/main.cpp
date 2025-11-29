@@ -3,7 +3,7 @@
 void mostrar_menu() {
     cout << "\n    SISTEMA DE DINASTIA REAL:    \n";
     cout << "1. Mostrar linea de sucesion actual (Solo los Vivos)\n";
-    cout << "2. Asignar Nuevo Rey Automaticamente\n"; // <--- Nuevo
+    cout << "2. Asignar Nuevo Rey Automaticamente\n";
     cout << "3. Modificar datos de un Noble\n";
     cout << "4. Guardar datos y Salir\n";
     cout << "Por favor, seleccione una opcion: ";
@@ -11,6 +11,7 @@ void mostrar_menu() {
 
 void limpiar_buffer() {
     cin.clear();
+    // Reemplazo de limits con un valor constante
     cin.ignore(256, '\n'); 
 }
 
@@ -22,23 +23,30 @@ void pausa() {
 void gestionar_opcion(ArbolDinamico& arbol, int opcion) {
     int id;
     string input;
-    
+
     switch (opcion) {
         case 1:
             arbol.mostrar_linea_sucesion();
             break;
         case 2:
-            arbol.asignar_nuevo_rey_auto(); // <--- LLAMADA IMPLEMENTADA
+            arbol.asignar_nuevo_rey_auto();
             break;
         case 3:
-            cout << "Opcion 3 (Modificar) pendiente de implementacion.\n";
+            cout << "Ingrese el ID del noble a modificar: ";
+            getline(cin, input);
+            try {
+                id = stoi(input);
+                arbol.modificar_noble(id);
+            } catch (...) {
+                cout << "ID no valido.\n";
+            }
             break;
         case 4:
-            arbol.guardar_a_csv(); 
+            arbol.guardar_a_csv();
             cout << "\nDatos guardados. Saliendo del programa...\n";
             break;
         default:
-            cout << "Opcion no valida. Intente de nuevo.\n";
+            cout << "Opcion no valida. Intenta de nuevo.\n";
     }
 }
 
@@ -53,7 +61,7 @@ int main() {
         Noble* rey_actual = arbol.obtener_rey_actual();
         if (!rey_actual) {
             cout << "No hay un rey inicial en los datos. Asignando el primero elegible...\n";
-            arbol.asignar_nuevo_rey_auto(); // <--- Intenta asignar rey al inicio si no hay
+            arbol.asignar_nuevo_rey_auto();
         }
 
         int opcion;
@@ -79,7 +87,7 @@ int main() {
         } while (opcion != 4);
         
     } catch (const exception& e) {
-        cerr << "Error critico al iniciar: " << e.what() << "\n";
+        cerr << "Error al iniciar: " << e.what() << "\n";
         pausa();
         return 1;
     }
