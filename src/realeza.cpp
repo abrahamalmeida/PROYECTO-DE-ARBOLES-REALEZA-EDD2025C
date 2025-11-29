@@ -155,7 +155,6 @@ void ArbolDinamico::mostrar_sucesion_vivos_recursivo(Noble* nodo, int& contador)
     mostrar_sucesion_vivos_recursivo(nodo->segundogenito, contador);
 }
 
-
 void ArbolDinamico::mostrar_linea_sucesion() const {
     Noble* rey_actual = obtener_rey_actual();
 
@@ -189,14 +188,11 @@ void ArbolDinamico::mostrar_linea_sucesion() const {
     }
 }
 
-//  NUEVAS FUNCIONES DE SUCESIÓN 
-
 Noble* ArbolDinamico::buscar_padre(Noble* hijo) const {
     if (!hijo || hijo == raiz) return nullptr;
     return buscar_noble_por_id(raiz, hijo->id_padre);
 }
 
-// Busca el primer descendiente varon vivo, priorizando la línea primogenitura
 Noble* ArbolDinamico::obtener_descendiente_vivo_varon(Noble* nodo, bool buscar_primogenito) {
     Noble* inicio = buscar_primogenito ? nodo->primogenito : nodo->segundogenito;
     if (!inicio) return nullptr;
@@ -212,7 +208,6 @@ Noble* ArbolDinamico::obtener_descendiente_vivo_varon(Noble* nodo, bool buscar_p
     return nullptr;
 }
 
-// Busca la mejor candidata mujer descendiente viva (más cerca de la raíz, luego más edad)
 Noble* ArbolDinamico::encontrar_candidato_mujer(Noble* nodo, Noble* mejor) const {
     if (!nodo) return mejor;
 
@@ -237,26 +232,21 @@ void ArbolDinamico::asignar_nuevo_rey_auto() {
         return;
     }
     
-    // 0. Si hay un rey, lo marcamos como ex-rey.
     if (rey_actual) {
         rey_actual->es_rey = false;
         rey_actual->fue_rey = true;
     } else {
-        // Si no hay rey (inicio del programa), buscamos desde la raíz
         nodo_inicio = raiz; 
     }
     
-    //  1. BUSCAR CANDIDATO VARÓN (DESCENDENCIA DIRECTA) 
-    candidato = obtener_descendiente_vivo_varon(nodo_inicio, true); // Primogénito y su descendencia
-    if (!candidato) candidato = obtener_descendiente_vivo_varon(nodo_inicio, false); // Segundogénito y su descendencia
+    candidato = obtener_descendiente_vivo_varon(nodo_inicio, true);
+    if (!candidato) candidato = obtener_descendiente_vivo_varon(nodo_inicio, false);
     
-    //  2. BUSCAR CANDIDATO MUJER (DESCENDENCIA DIRECTA) 
     if (!candidato) {
         candidato = encontrar_candidato_mujer(nodo_inicio->primogenito, nullptr);
         candidato = encontrar_candidato_mujer(nodo_inicio->segundogenito, candidato);
     }
     
-    // 3. BUSCAR CANDIDATO EN LÍNEA COLATERAL (Ascender y buscar en hermanos/tíos)
     if (!candidato) {
         Noble* ancestro = rey_actual; 
         
@@ -264,33 +254,28 @@ void ArbolDinamico::asignar_nuevo_rey_auto() {
             Noble* padre = buscar_padre(ancestro);
             if (!padre) break;
 
-            // La clave es buscar en la rama hermana que no hemos explorado
             if (padre->primogenito == ancestro && padre->segundogenito) {
                 Noble* linea_colateral = padre->segundogenito;
                 
-                // Prioridad Colateral Varon
                 candidato = obtener_descendiente_vivo_varon(linea_colateral, true);
                 if (!candidato) candidato = obtener_descendiente_vivo_varon(linea_colateral, false);
                 
-                // Prioridad Colateral Mujer
                 if (!candidato) {
                     candidato = encontrar_candidato_mujer(linea_colateral->primogenito, nullptr);
                     candidato = encontrar_candidato_mujer(linea_colateral->segundogenito, candidato);
                 }
                 
-                if (candidato) break; // Encontrado en colateral
+                if (candidato) break;
             }
             
-            // Subir un nivel para buscar tios o primos
             ancestro = padre;
         }
     }
     
-    // 4. Asignar el nuevo rey
     if (candidato) {
         candidato->es_rey = true;
         cout << "\n=============================================\n";
-        cout << "¡NUEVO MONARCA ASIGNADO AUTOMATICAMENTE!\n";
+        cout << "NUEVO MONARCA ASIGNADO AUTOMATICAMENTE\n";
         cout << "ID: " << candidato->id << " - " << candidato->nombre << " " << candidato->apellido;
         cout << " (" << (candidato->genero == 'M' ? "Rey" : "Reina") << ", Edad: " << candidato->edad << ")\n";
         cout << "=============================================\n";
@@ -302,8 +287,82 @@ void ArbolDinamico::asignar_nuevo_rey_auto() {
     }
 }
 
+//  Implementación de la Modificación 
+
+void ArbolDinamico::modificar_noble(int id_noble) {
+    Noble* noble = buscar_noble_por_id(raiz, id_noble);
+    if (!noble) {
+        cout << "Error: Noble con ID " << id_noble << " no encontrado.\n";
+        return;
+    }
+
+    cout << "\n    MODIFICANDO A " << noble->nombre << " " << noble->apellido << " (ID: " << noble->id << ") ===\n";
+    cout << "Deje vacio para mantener el valor actual. (Solo se modifican campos de texto/estado)\n";
+    
+    string input;
+
+    cout << "Nuevo Nombre (" << noble->nombre << "): ";
+    getline(cin, input);
+    if (!input.empty()) noble->nombre = input;
+
+    cout << "Nuevo Apellido (" << noble->apellido << "): ";
+    getline(cin, input);
+    if (!input.empty()) noble->apellido = input;
+    
+    cout << "Nuevo Genero (H/M) (" << noble->genero << "): ";
+    getline(cin, input);
+    if (!input.empty() && (input[0] == 'H' || input[0] == 'M')) noble->genero = input[0];
+
+    cout << "Nueva Edad (" << noble->edad << "): ";
+    getline(cin, input);
+    if (!input.empty()) {
+        try {
+            noble->edad = stoi(input);
+        } catch (...) {
+            cout << "Edad no valida. Se mantiene la anterior.\n";
+        }
+    }
+    
+    string estado_muerto = noble->esta_muerto ? "1 (Muerto)" : "0 (Vivo)";
+    cout << "Esta Muerto (1/0) (" << estado_muerto << "): ";
+    getline(cin, input);
+    if (!input.empty()) noble->esta_muerto = convertir_a_bool(input);
+
+    string estado_fue_rey = noble->fue_rey ? "1 (Si)" : "0 (No)";
+    cout << "Fue Rey (1/0) (" << estado_fue_rey << "): ";
+    getline(cin, input);
+    if (!input.empty()) noble->fue_rey = convertir_a_bool(input);
+
+    // Manejo de la Corona (es_rey)
+    string estado_es_rey = noble->es_rey ? "1 (Si)" : "0 (No)";
+    cout << "Es Rey (1/0) (" << estado_es_rey << "): ";
+    getline(cin, input);
+    bool nuevo_es_rey = noble->es_rey; 
+    if (!input.empty()) {
+        nuevo_es_rey = convertir_a_bool(input);
+    }
+
+    if (noble->esta_muerto && nuevo_es_rey) {
+        cout << "Advertencia: Un noble muerto no puede ser Rey. 'Es Rey' se establece en 0.\n";
+        noble->es_rey = false;
+    } else if (nuevo_es_rey && !noble->es_rey) {
+        Noble* rey_actual = obtener_rey_actual();
+        if (rey_actual) {
+            rey_actual->es_rey = false;
+            rey_actual->fue_rey = true;
+            cout << "Advertencia: El noble " << rey_actual->nombre << " ya no es Rey.\n";
+        }
+        noble->es_rey = true;
+        noble->fue_rey = true; 
+    } else if (!nuevo_es_rey && noble->es_rey) {
+        noble->es_rey = false;
+        cout << "Advertencia: El Rey/Reina ha sido destronado. Ejecute Opcion 2 para nombrar un sucesor.\n";
+    }
+    
+    cout << "\nDatos de " << noble->nombre << " actualizados correctamente.\n";
+}
+
 // Las funciones auxiliares de busqueda de colaterales se dejan vacías ya que la lógica principal las engloba
 Noble* ArbolDinamico::buscar_hermano_vivo(Noble* rey_muerto) { return nullptr; }
 Noble* ArbolDinamico::buscar_tio_vivo(Noble* rey_muerto) { return nullptr; }
 Noble* ArbolDinamico::buscar_primer_ancestro_con_dos_hijos(Noble* inicio) { return nullptr; }
-void ArbolDinamico::modificar_noble(int id_noble) {}
